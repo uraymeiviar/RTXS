@@ -1,0 +1,37 @@
+#!/bin/bash
+PKGNAME="binutils"
+CONFIGUREOPT="--enable-shared --disable-werror --enable-lto"
+SOURCEPATH="../../sources/binutils"
+BUILDPATH="../../builds/binutils"
+DESTPATH="../../packages/binutils"
+BUILDCONFIGPATH="../../build.config"
+
+SOURCEABSPATH="$(readlink -e $SOURCEPATH)"
+BUILDABSPATH="$(readlink -e $BUILDPATH)"
+BUILDCONFIGABSPATH="$(readlink -e $BUILDCONFIGPATH)"
+DESTABSPATH="$(readlink -e $DESTPATH)"
+PWD=`pwd`
+source "$BUILDCONFIGABSPATH"
+
+if [ -d "$SOURCEABSPATH" ]; then
+        if [ -d "$DESTABSPATH" ]; then
+                rm -rf "$DESTABSPATH"
+        fi
+        mkdir "$DESTPATH"
+	DESTABSPATH="$(readlink -e $DESTPATH)"
+
+	if [ -d "$BUILDABSPATH" ]; then
+		rm -rf "$BUILDABSPATH"
+	fi
+	mkdir "$BUILDPATH"
+	cd "$BUILDPATH"
+
+	eval "make clear"
+	echo "=== Compiling $PKGNAME with CFlags=$BUILDCFLAGS ==="
+	eval "CFLAGS=\"$BUILDCFLAGS\" $SOURCEPATH/configure $CONFIGUREOPT"
+	eval "make"
+	eval "make check"
+	eval "make install DESTDIR=$DESTABSPATH"
+else
+	echo "!! $SOURCEABSPATH does not exists (from $PWD)"
+fi

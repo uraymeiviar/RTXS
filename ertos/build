@@ -1,0 +1,48 @@
+#!/bin/bash
+
+ERTOSVER="1.0"
+DOWNLOAD_LIST="./source.list"
+DOWNLOAD_TARGET="./downloads"
+EXTRACT_TARGET="./sources"
+SCRIPT_DIR="./scripts"
+BUILD_SCRIPT_FILENAME="build"
+
+while read -r url
+do
+	filename=$(basename "$url")
+	pkgname="$( cut -d '-' -f 1 <<< "$filename" )"
+	pkgvername=${filename%.tar*}
+
+	echo "$pkgvername"
+
+	#Download file
+	if [ ! -f "$DOWNLOAD_TARGET/$filename" ]; then
+		echo "downloading from $url to $DOWNLOAD_TARGET/$filename"
+		wget "$url" -O "$DOWNLOAD_TARGET/$filename"
+	fi
+
+	#Extract Downloaded File
+        extractPath="$EXTRACT_TARGET/$pkgname"
+	if [ -d "$extractPath" ]; then
+		rm -rf "$extractPath"
+	fi
+	echo "extracting $filename to $extractPath"
+	mkdir "$extractPath"
+	tar xC "$extractPath" -f "$DOWNLOAD_TARGET/$filename"
+	if [ -d "$extractPath/$pkgvername" ]; then
+		mv -f "$extractPath/$pkgvername"/* "$extractPath"/
+		rm -rf "$extractPath/$pkgvername"
+	fi
+
+	#Check if build script exists
+	scriptPath="$SCRIPT_DIR/$pkgname"
+	scriptFile="$scriptPath/$BUILD_SCRIPT_FILENAME"
+	if [ -f "$scriptFile" ]; then
+		pwd=`pwd`
+		cd "$scriptPath"
+		bash "./$BUILD_SCRIPT_FILENAME"
+		cd "$pwd"
+	else
+		echo "!! build script does not exist at $scriptFile"
+	fi
+done < "$DOWNLOAD_LIST"
