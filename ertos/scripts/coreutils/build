@@ -1,0 +1,69 @@
+#!/bin/bash
+PKGNAME="coreutils"
+CONFIGUREOPT="--without-selinux --enable-silent-rules --prefix=/usr"
+
+#include global config script
+BUILDCONFIGPATH="../../build.config"
+BUILDCONFIGABSPATH="$(readlink -e $BUILDCONFIGPATH)"
+source "$BUILDCONFIGABSPATH"
+
+#define needed dirs
+SOURCEPATH="../../$SOURCEDIRNAME/$PKGNAME"
+BUILDPATH="../../$BUILDDIRNAME/$PKGNAME"
+DESTPATH="../../$ROOTFSDIRNAME/$PKGNAME"
+PKGPATH="../../$PKGDIRNAME"
+
+#convert relative path to absolute
+SOURCEABSPATH="$(readlink -e $SOURCEPATH)"
+BUILDABSPATH="$(readlink -e $BUILDPATH)"
+BUILDCONFIGABSPATH="$(readlink -e $BUILDCONFIGPATH)"
+DESTABSPATH="$(readlink -e $DESTPATH)"
+PKGABSPATH="$(readlink -e $PKGPATH)"
+PWD=`pwd`
+
+if [ -d "$SOURCEABSPATH" ]; then
+        if [ -d "$DESTABSPATH" ]; then
+                rm -rf "$DESTABSPATH"
+        fi
+        mkdir "$DESTPATH"
+	DESTABSPATH="$(readlink -e $DESTPATH)"
+
+	if [ -d "$BUILDABSPATH" ]; then
+		rm -rf "$BUILDABSPATH"
+	fi
+	mkdir "$BUILDPATH"
+
+	#start building
+	cd "$SOURCEPATH"
+	eval "wget http://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-8.24-i18n-1.patch"
+	eval "patch -Np1 -i ./coreutils-8.24-i18n-1.patch"
+	eval "sed -i '/tests\/misc\/sort.pl/ d' Makefile.in"
+
+        cd "$BUILDPATH"
+	echo "=== Compiling $PKGNAME with CFlags=$BUILDCFLAGS ==="
+	eval "make clear"
+	eval "CFLAGS=\"$BUILDCFLAGS\" FORCE_UNSAFE_CONFIGURE=1 $SOURCEPATH/configure $CONFIGUREOPT"
+	eval "make"
+	if [ "$RUN_TEST" = true ]; then
+		eval "make NON_ROOT_USERNAME=nobody check-root"
+	fi
+	eval "make install DESTDIR=$DESTABSPATH"
+
+	if [ -d "$DESTABSPATH" ]; then
+		#remove garbage
+		eval "rm -rf $DESTABSPATH/usr/share"
+		eval "strip -s $DESTABSPATH/usr/bin/*"
+		eval "strip -s $DESTABSPATH/usr/libexec/coreutils/*"
+		eval "mkdir -p $DESTABSPATH/bin"
+		eval "mv $DESTABSPATH/usr/bin/* $DESTABSPATH/bin/"
+		eval "mkdir -p $DESTABSPATH/usr/sbin"
+		eval "mv $DESTABSPATH/bin/chroot $DESTABSPATH/usr/sbin/"
+
+		#create package
+		PKGFILEPATH="$PKGABSPATH/$PKGNAME.$PKG_EXT"
+		echo "=== creating $PKGFILEPATH ==="
+		eval "$PKG_CMD $PKGFILEPATH $DESTABSPATH/*"
+	fi
+else
+	echo "!! $SOURCEABSPATH does not exists (from $PWD)"
+fi
