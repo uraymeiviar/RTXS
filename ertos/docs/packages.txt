@@ -1,0 +1,329 @@
+-- core
+coreutils
+binutils
+bash
+bin86
+e2fsprogs
+procps
+etc
+findutils
+gawk
+grep
+gzip
+kmod
+sed
+shadow
+sysvinit
+sysvinit-functions
+sysvinit-scripts
+udev
+util-linux
+xz
+tar
+file
+logrotate
+which
+less
+lilo
+time
+tree
+patch
+screen
+syslinux
+libtermcap
+lsof
+
+-- devtools
+pciutils
+libusb
+usbutils
+acpid
+alsa-lib
+alsa-oss
+alsa-utils
+dmidecode
+lm_sensors
+lsscsi
+hdparm
+sdparm
+pm-utils
+cpufrequtils
+
+-- nettools
+ca-certificates
+cifs-utils
+dhcpd
+ethtool
+icmpinfo
+iftop
+iputils
+iproute2
+libnl3
+mtr
+net-tools
+network-scripts
+ntp
+openssh
+openvpn
+libnl
+rsync
+tcp_wrappers
+tcpdump
+libpcap
+telnet
+traceroute
+vlan
+wget
+whois
+openssl
+gnupg
+
+=== coreutils ===
+|-- bin
+|   |-- [
+|   |-- base64
+|   |-- basename
+|   |-- cat
+|   |-- chcon
+|   |-- chgrp
+|   |-- chmod
+|   |-- chown
+|   |-- cksum
+|   |-- comm
+|   |-- cp
+|   |-- csplit
+|   |-- cut
+|   |-- date
+|   |-- dd
+|   |-- df
+|   |-- dir
+|   |-- dircolors
+|   |-- dirname
+|   |-- du
+|   |-- echo
+|   |-- env
+|   |-- expand
+|   |-- expr
+|   |-- factor
+|   |-- false
+|   |-- fmt
+|   |-- fold
+|   |-- groups
+|   |-- head
+|   |-- hostid
+|   |-- id
+|   |-- install
+|   |-- join
+|   |-- kill
+|   |-- link
+|   |-- ln
+|   |-- logname
+|   |-- ls
+|   |-- md5sum
+|   |-- mkdir
+|   |-- mkfifo
+|   |-- mknod
+|   |-- mktemp
+|   |-- mv
+|   |-- nice
+|   |-- nl
+|   |-- nohup
+|   |-- nproc
+|   |-- numfmt
+|   |-- od
+|   |-- paste
+|   |-- pathchk
+|   |-- pinky
+|   |-- pr
+|   |-- printenv
+|   |-- printf
+|   |-- ptx
+|   |-- pwd
+|   |-- readlink
+|   |-- realpath
+|   |-- rm
+|   |-- rmdir
+|   |-- runcon
+|   |-- seq
+|   |-- sha1sum
+|   |-- sha224sum
+|   |-- sha256sum
+|   |-- sha384sum
+|   |-- sha512sum
+|   |-- shred
+|   |-- shuf
+|   |-- sleep
+|   |-- sort
+|   |-- split
+|   |-- stat
+|   |-- stdbuf
+|   |-- stty
+|   |-- sum
+|   |-- sync
+|   |-- tac
+|   |-- tail
+|   |-- tee
+|   |-- test
+|   |-- timeout
+|   |-- touch
+|   |-- tr
+|   |-- true
+|   |-- truncate
+|   |-- tsort
+|   |-- tty
+|   |-- uname
+|   |-- unexpand
+|   |-- uniq
+|   |-- unlink
+|   |-- uptime
+|   |-- users
+|   |-- vdir
+|   |-- wc
+|   |-- who
+|   |-- whoami
+|   `-- yes
+`-- usr
+    |-- bin
+    |-- libexec
+    |   `-- coreutils
+    |       `-- libstdbuf.so
+    `-- sbin
+        `-- chroot
+
+=== binutils ===
+`-- usr
+    |-- bin
+    |   |-- addr2line
+    |   |     Translates program addresses to file names and line numbers; given an address 
+    |   |     and the name of an executable, it uses the debugging information in the
+    |   |     executable to determine which source file and line number are associated with 
+    |   |     the address
+    |   |-- ar
+    |   |     Creates, modifies, and extracts from archives
+    |   |-- as
+    |   |     An assembler that assembles the output of gcc into object files
+    |   |-- c++filt
+    |   |     Used by the linker to de-mangle C++ and Java symbols and to keep overloaded
+    |   |     functions from clashing
+    |   |-- elfedit
+    |   |     Updates the ELF header of ELF files
+    |   |-- gprof
+    |   |     Displays call graph profile data
+    |   |-- ld
+    |   |     A linker that combines a number of object and archive files into a single file,
+    |   |     relocating their data and tying up symbol references
+    |   |-- ld.bfd
+    |   |     Hard link to ld
+    |   |-- nm
+    |   |     Lists the symbols occurring in a given object file
+    |   |-- objcopy
+    |   |     Translates one type of object file into another
+    |   |-- objdump
+    |   |     Displays information about the given object file, with options controlling the
+    |   |     particular information to display; the information shown is useful to
+    |   |     programmers who are working on the compilation tools
+    |   |-- ranlib
+    |   |     Generates an index of the contents of an archive and stores it in the archive;
+    |   |     the index lists all of the symbols defined by archive members that are 
+    |   |     relocatable object files
+    |   |-- readelf
+    |   |     Displays information about ELF type binaries
+    |   |-- size
+    |   |     Lists the section sizes and the total size for the given object files
+    |   |-- strings
+    |   |     Outputs, for each given file, the sequences of printable characters that are of
+    |   |     at least the specified length (defaulting to four); for object files, it prints,
+    |   |     by default, only the strings from the initializing and loading sections while
+    |   |     for other types of files, it scans the entire file
+    |   `-- strip
+    |         Discards symbols from object files
+    |-- include
+    |   |-- ansidecl.h
+    |   |-- bfd.h
+    |   |-- bfdlink.h
+    |   |-- dis-asm.h
+    |   |-- plugin-api.h
+    |   `-- symcat.h
+    `-- lib
+        |-- ldscripts
+        |   |-- elf32_x86_64.x
+        |   |-- elf32_x86_64.xbn
+        |   |-- elf32_x86_64.xc
+        |   |-- elf32_x86_64.xd
+        |   |-- elf32_x86_64.xdc
+        |   |-- elf32_x86_64.xdw
+        |   |-- elf32_x86_64.xn
+        |   |-- elf32_x86_64.xr
+        |   |-- elf32_x86_64.xs
+        |   |-- elf32_x86_64.xsc
+        |   |-- elf32_x86_64.xsw
+        |   |-- elf32_x86_64.xu
+        |   |-- elf32_x86_64.xw
+        |   |-- elf_i386.x
+        |   |-- elf_i386.xbn
+        |   |-- elf_i386.xc
+        |   |-- elf_i386.xd
+        |   |-- elf_i386.xdc
+        |   |-- elf_i386.xdw
+        |   |-- elf_i386.xn
+        |   |-- elf_i386.xr
+        |   |-- elf_i386.xs
+        |   |-- elf_i386.xsc
+        |   |-- elf_i386.xsw
+        |   |-- elf_i386.xu
+        |   |-- elf_i386.xw
+        |   |-- elf_k1om.x
+        |   |-- elf_k1om.xbn
+        |   |-- elf_k1om.xc
+        |   |-- elf_k1om.xd
+        |   |-- elf_k1om.xdc
+        |   |-- elf_k1om.xdw
+        |   |-- elf_k1om.xn
+        |   |-- elf_k1om.xr
+        |   |-- elf_k1om.xs
+        |   |-- elf_k1om.xsc
+        |   |-- elf_k1om.xsw
+        |   |-- elf_k1om.xu
+        |   |-- elf_k1om.xw
+        |   |-- elf_l1om.x
+        |   |-- elf_l1om.xbn
+        |   |-- elf_l1om.xc
+        |   |-- elf_l1om.xd
+        |   |-- elf_l1om.xdc
+        |   |-- elf_l1om.xdw
+        |   |-- elf_l1om.xn
+        |   |-- elf_l1om.xr
+        |   |-- elf_l1om.xs
+        |   |-- elf_l1om.xsc
+        |   |-- elf_l1om.xsw
+        |   |-- elf_l1om.xu
+        |   |-- elf_l1om.xw
+        |   |-- elf_x86_64.x
+        |   |-- elf_x86_64.xbn
+        |   |-- elf_x86_64.xc
+        |   |-- elf_x86_64.xd
+        |   |-- elf_x86_64.xdc
+        |   |-- elf_x86_64.xdw
+        |   |-- elf_x86_64.xn
+        |   |-- elf_x86_64.xr
+        |   |-- elf_x86_64.xs
+        |   |-- elf_x86_64.xsc
+        |   |-- elf_x86_64.xsw
+        |   |-- elf_x86_64.xu
+        |   |-- elf_x86_64.xw
+        |   |-- i386linux.x
+        |   |-- i386linux.xbn
+        |   |-- i386linux.xn
+        |   |-- i386linux.xr
+        |   `-- i386linux.xu
+        |-- libbfd-2.25.1.so
+        |      The Binary File Descriptor library
+        |-- libbfd.a
+        |-- libbfd.la
+        |-- libbfd.so -> libbfd-2.25.1.so
+        |-- libopcodes-2.25.1.so
+        |      A library for dealing with opcodes—the “readable text” versions of instructions
+        |      for the processor; it is used for building utilities like objdump
+        |-- libopcodes.a
+        |-- libopcodes.la
+        `-- libopcodes.so -> libopcodes-2.25.1.so
