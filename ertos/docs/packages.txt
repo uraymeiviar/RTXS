@@ -2,7 +2,6 @@
 coreutils
 binutils
 bash
-bin86
 e2fsprogs
 procps
 etc
@@ -16,7 +15,6 @@ shadow
 sysvinit
 sysvinit-functions
 sysvinit-scripts
-udev
 util-linux
 xz
 tar
@@ -27,13 +25,17 @@ less
 lilo
 time
 tree
-patch
 screen
 syslinux
 libtermcap
 lsof
 
--- devtools
+-- devtools --
+bin86
+patch
+
+-- hwtools
+udev
 pciutils
 libusb
 usbutils
@@ -327,3 +329,7 @@ gnupg
         |-- libopcodes.a
         |-- libopcodes.la
         `-- libopcodes.so -> libopcodes-2.25.1.so
+
+=== bash ===
+|-- bin
+|   `-- bash

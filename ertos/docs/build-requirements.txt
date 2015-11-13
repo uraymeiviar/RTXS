@@ -1,0 +1,14 @@
+gcc
+g++
+make
+automake
+autoconf
+m4
+bison
+gawk
+sed
+patch
+git
+wget
+tar
+libacl1-dev

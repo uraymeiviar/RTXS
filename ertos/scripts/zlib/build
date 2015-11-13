@@ -1,0 +1,71 @@
+#!/bin/bash
+PKGNAME="zlib"
+CONFIGUREOPT="--silent --prefix=/usr"
+
+#include global config script
+BUILDCONFIGPATH="../../build.config"
+BUILDCONFIGABSPATH="$(readlink -e $BUILDCONFIGPATH)"
+source "$BUILDCONFIGABSPATH"
+
+#define needed dirs
+SOURCEPATH="../../$SOURCEDIRNAME/$PKGNAME"
+BUILDPATH="../../$BUILDDIRNAME/$PKGNAME"
+DESTPATH="../../$ROOTFSDIRNAME/$PKGNAME"
+PKGPATH="../../$PKGDIRNAME"
+
+#convert relative path to absolute
+SOURCEABSPATH="$(readlink -e $SOURCEPATH)"
+BUILDABSPATH="$(readlink -e $BUILDPATH)"
+BUILDCONFIGABSPATH="$(readlink -e $BUILDCONFIGPATH)"
+DESTABSPATH="$(readlink -e $DESTPATH)"
+PKGABSPATH="$(readlink -e $PKGPATH)"
+PWD=`pwd`
+
+if [ -d "$SOURCEABSPATH" ]; then
+        if [ -d "$DESTABSPATH" ]; then
+                rm -rf "$DESTABSPATH"
+        fi
+        mkdir "$DESTPATH"
+	DESTABSPATH="$(readlink -e $DESTPATH)"
+
+	if [ -d "$BUILDABSPATH" ]; then
+		rm -rf "$BUILDABSPATH"
+	fi
+	mkdir "$BUILDPATH"
+
+	#start building
+	echo "=== Configuring $PKGNAME with CFlags=$BUILDCFLAGS ==="
+	eval "cd $SOURCEPATH"
+	eval "make clear | tee buildlog-clear"
+	eval "CFLAGS=\"$BUILDCFLAGS\" ./configure $CONFIGUREOPT > buildlog-configure"
+        
+	echo "=== Compiling $PKGNAME with CFlags=$BUILDCFLAGS ==="
+	eval "make -s V=0 | tee buildlog-clear"
+
+        if [ "$RUN_TEST" = true ]; then
+	        echo "=== Checking $PKGNAME build ==="
+                eval "make check"
+        fi
+
+        echo "=== Installing $PKGNAME to package directory and rootfs ==="
+	eval "make -s V=0 install DESTDIR=$DESTABSPATH | tee buildlog-install"
+
+	if [ -d "$DESTABSPATH" ]; then
+		#remove garbage
+		eval "mv $DESTABSPATH/usr/local/* $DESTABSPATH/usr"
+		eval "rm -rf $DESTABSPATH/usr/local"
+		eval "rm -rf $DESTABSPATH/usr/share"
+		eval "rm -rf $DESTABSPATH/usr/lib/pkgconfig"
+		eval "strip -s $DESTABSPATH/usr/lib/*"
+		eval "mkdir $DESTABSPATH/lib"
+		eval "mv $DESTABSPATH/usr/lib/* $DESTABSPATH/lib/"
+		eval "rm -rf $DESTABSPATH/usr/lib"
+
+		#create package
+		PKGFILEPATH="$PKGABSPATH/$PKGNAME.$PKG_EXT"
+		echo "=== creating $PKGFILEPATH ==="
+		eval "$PKG_CMD $PKGFILEPATH $DESTABSPATH/*"
+	fi
+else
+	echo "!! $SOURCEABSPATH does not exists (from $PWD)"
+fi
