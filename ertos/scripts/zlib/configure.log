@@ -1,9 +1,0 @@
---------------------
-../../sources/zlib/configure --silent --prefix=/usr
-Fri Nov 13 19:31:41 WIB 2015
-unknown option: --silent
-../../sources/zlib/configure --help for help
-** ../../sources/zlib/configure aborting.
---------------------
-
-
