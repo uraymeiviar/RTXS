@@ -1,31 +1,66 @@
 #!/bin/bash
 . rtos.config
-if [ ! -d ./linux ]; then
-	echo "cloning linux from git repo"
-	git clone https://github.com/torvalds/linux.git
-fi
-cd linux
-git checkout -- *
-git checkout "tags/$CheckoutTag"
-make mrproper
-cp ./../kernel-config ./.config
-cp ./../kernel-config ./.config-x86_64
 
-cd ..
-if [ ! -f ./aufs4-standalone ]; then
+linux="linux-$KernelVersion"
+if [ "$GetFromGit" == "1" ]; then
+	if [ ! -d "./$linux" ]; then
+		echo "cloning $linux from git repo"
+		git clone https://github.com/torvalds/linux.git
+	fi
+	cd "$linux"
+	git checkout -- *
+	git checkout "tags/$CheckoutTag"
+	cd ..
+else
+	SourceFile=${Url##*/}
+	if [ ! -f "$SourceFile" ]; then
+		wget --no-check-certificate $Url -O $SourceFile
+	fi
+	if [ -d "linux-$KernelVersion" ]; then
+		rm -rf "./linux-$KernelVersion"
+	fi
+	tar -Jxvf $SourceFile
+fi
+
+if [ ! -d ./aufs4-standalone ]; then
 	echo "cloning aufs patch from git repo"
 	git clone https://github.com/sfjro/aufs4-standalone.git
 fi
 cd aufs4-standalone
 git checkout -- *
 git checkout origin/aufs4.3
-cp -rf ./fs/* ../linux/fs/
-cp -f ./include/uapi/linux/aufs_type.h ../linux/include/uapi/linux/
+eval "cp -rf ./fs/* ../$linux/fs/"
+eval "cp -f ./include/uapi/linux/aufs_type.h ../$linux/include/uapi/linux/"
 
 cd ..
-cd linux
+
+if [ -d ./build ]; then
+	rm -rf ./build
+fi
+mkdir -p build
+BuildPath=`cd ./build; pwd`
+
+cd "$linux"
+echo "cleaning source directory"
+make distclean
+
+echo "applying kernel patches"
 cp ../aufs4-standalone/aufs4*.patch ./
 patch -p1 < aufs4-kbuild.patch
 patch -p1 < aufs4-base.patch
 patch -p1 < aufs4-loopback.patch
 patch -p1 < aufs4-mmap.patch
+
+echo "preparing kernel source"
+make mrproper O="$BuildPath"
+cp ./../kernel-config ./x86_64_defconfig
+
+echo "configuring kernel"
+make defconfig O="$BuildPath"
+
+echo "building kernel image"
+make -j8 bzImage O="$BuildPath"
+
+cp "arch/x86/boot/bzImage" ../vmlinuz
+cd $BuildPath
+
