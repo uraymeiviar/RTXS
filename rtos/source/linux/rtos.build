@@ -61,6 +61,17 @@ make defconfig O="$BuildPath"
 echo "building kernel image"
 make -j8 bzImage O="$BuildPath"
 
-cp "arch/x86/boot/bzImage" ../vmlinuz
-cd $BuildPath
+cp "$BuildPath/arch/x86/boot/bzImage" ../vmlinuz
+
+make -j8 modules O="$BuildPath"
+mkdir ../modules
+
+ModulePath=`cd ../modules; pwd`
+make modules_install O="$BuildPath" INSTALL_MOD_PATH="$ModulePath"
+
+mkdir ../Headers
+HeadersPath=`cd ../Headers; pwd`
+make headers_install O="$BuildPath" INSTALL_HDR_PATH="$HeadersPath"
+
+make distclean
 
