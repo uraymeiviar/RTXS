@@ -1,0 +1,21 @@
+#!/bin/bash
+
+SCRIPT=$0
+DIRECTORY=$1
+INITRAMFS=$2
+
+usage()
+{
+echo
+echo "convert a directory tree to a cpio xz initramfs image file"
+echo "usage: $SCRIPT directory initramfs.cpio.xz"
+}
+
+not_a_directory() { echo; echo "$DIRECTORY is not a directory"; }
+
+exit_1() { echo; exit 1; }
+
+if [ $# -ne 2 ]; then usage; exit_1; fi
+if [ ! -d "$DIRECTORY" ]; then usage; not_a_directory; exit_1; fi
+
+(cd "$DIRECTORY"; find . | cpio -o -H newc 2>/dev/null | xz --compress --check=crc32 > "$INITRAMFS")

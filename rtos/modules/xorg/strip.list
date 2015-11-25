@@ -1,0 +1,14 @@
+usr/doc/*
+usr/share/doc/*
+usr/share/locale/*
+usr/share/gtk-doc/*
+usr/man/*
+var/log/packages/*
+var/log/removed_packages/*
+var/log/removed_scripts/*
+var/log/scripts/*
+var/lib/dpkg/*
+usr/share/i18n/locales/*
+usr/share/info/*
+etc/group
+etc/X11/xinit/xinitrc

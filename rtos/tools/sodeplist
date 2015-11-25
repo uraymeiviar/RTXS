@@ -1,0 +1,6 @@
+#!/bin/sh
+path="$1"
+IFS=$'\n';for file in $(find "$path" -name '*.so' -or -type f -executable); do 
+        filepath=`readlink -f $file`
+        eval "ldd $file | grep 'not found'"
+done

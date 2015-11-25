@@ -1,0 +1,59 @@
+#!/bin/bash
+
+if [ "$#" -lt 2 ]; then
+	echo "usage   : $0 [source.list file] [rootfs dir]"
+	echo "example : $0 ./source.list ./pkg-rootfs"
+else
+	SourceList=`readlink -f $1`
+	FsDir=`readlink -f $2`
+
+	mkdir -p $FsDir
+
+	while read url; do
+        	urlfile="${url##*/}"
+        	destdl="./$urlfile"
+        	if [ ! -f "$destdl" ]; then
+                	wget -q --no-check-certificate $url -O $destdl
+        	fi
+        	if [ -f "$destdl" ]; then
+			if [[ $destdl == *.txz ]] || [[ $destdl == *.tgz ]]; then
+				echo "extracting $destdl"
+                		eval "installpkg --root $FsDir $destdl | grep \" error \""
+			elif [[ $destdl == *.deb ]]; then
+				echo "converting $destdl"
+				eval "deb2txz $destdl | grep \" error \""
+				echo "extracting $destdl.txz"
+				eval "installpkg --root $FsDir $destdl.txz | grep \"error\""
+				rm -f "$destdl.txz"
+			else
+				echo "--- error: dont know to extract $destdl"
+			fi
+        	else
+                	echo "--- error: file not found $destdl ---"
+        	fi
+	done <  $1
+
+	if [ -d ./prebuilt ]; then
+		for filename in ./prebuilt/*.txz; do
+			installpkg --root $FsDir $filename
+		done
+	fi
+
+	if [ -d "$FsDir/usr/lib/x86_64-linux-gnu" ]; then
+		mkdir -p "$FsDir/usr/lib64"
+		eval "cp -rf --preserve=all $FsDir/usr/lib/x86_64-linux-gnu/* $FsDir/usr/lib64/"
+		eval "rm -rf $FsDir/usr/lib/x86_64-linux-gnu"
+	fi
+
+        if [ -d "$FsDir/lib/x86_64-linux-gnu" ]; then
+                mkdir -p "$FsDir/lib64"
+                eval "cp -rf --preserve=all $FsDir/lib/x86_64-linux-gnu/* $FsDir/lib64/"
+                eval "rm -rf $FsDir/lib/x86_64-linux-gnu"
+        fi
+
+        if [ -d "$FsDir/usr/lib" ]; then
+                mkdir -p "$FsDir/usr/lib64"
+                eval "cp -rf --preserve=all $FsDir/usr/lib/* $FsDir/usr/lib64/"
+                eval "rm -rf $FsDir/usr/lib"
+        fi
+fi

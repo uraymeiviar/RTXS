@@ -1,0 +1,25 @@
+#!/bin/sh
+if [ "$#" -lt 3 ]; then
+        echo "usage   : $0 [source.list file] [rootfs dir] [strip dir]"
+        echo "example : $0 ./source.list ./pkg-rootfs ./strip-fs"
+else
+        StripList=`readlink -f $1`
+        FsDir=`readlink -f $2`
+        StripDir=`readlink -f $3`
+
+	mkdir -p $StripDir
+
+	if [ -d $FsDir ]; then
+		while read path; do
+			echo "stripping $FsDir/$path to $StripDir/$path"
+			dirname=$(dirname "$StripDir/$path")
+			eval "mkdir -p $dirname"
+
+			eval "cp -rf --preserve=all $FsDir/$path $dirname"
+			eval "rm -rf $FsDir/$path"
+		done < $StripList
+	else
+		echo "path $FsDir does not exist"
+	fi
+fi
+

@@ -1,0 +1,7 @@
+#!/bin/sh
+rm -rf ./rootfs
+rm -rf ./stripfs
+rm -f ./*.sb
+rm -f ./*.txz
+rm -f ./*.tgz
+rm -f ./*.deb

@@ -1,0 +1,30 @@
+#!/bin/bash
+if [ -f ./source.list ]; then
+	./makefs ./source.list ./rootfs 
+else
+	echo "file ./source.list not found"
+fi
+
+if [ -f ./strip.list ]; then
+        ./strip ./strip.list ./rootfs ./stripfs
+else
+        echo "file ./strip.list not found, skipping strip process"
+fi
+
+if [ -d ./rootcopy ]; then
+	cp -rf --preserve=all ./rootcopy/* ./rootfs
+elif [ -f ./rootcopy.tar.xz ]; then
+        tar -Jxvf ./rootcopy.tar.xz
+	cp -rf --preserve=all ./rootcopy/* ./rootfs
+else
+	echo "skipping rootcopy"
+fi
+
+echo "content size :"
+du -sch ./rootfs
+
+echo "stripped size :"
+du -sch ./stripfs
+
+dir2sb ./rootfs ./01-rtos-base-7.sb
+

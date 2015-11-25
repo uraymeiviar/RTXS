@@ -1,0 +1,31 @@
+#!/bin/bash
+. rtos.config
+if [ ! -d ./linux ]; then
+	echo "cloning linux from git repo"
+	git clone https://github.com/torvalds/linux.git
+fi
+cd linux
+git checkout -- *
+git checkout "tags/$CheckoutTag"
+make mrproper
+cp ./../kernel-config ./.config
+cp ./../kernel-config ./.config-x86_64
+
+cd ..
+if [ ! -f ./aufs4-standalone ]; then
+	echo "cloning aufs patch from git repo"
+	git clone https://github.com/sfjro/aufs4-standalone.git
+fi
+cd aufs4-standalone
+git checkout -- *
+git checkout origin/aufs4.3
+cp -rf ./fs/* ../linux/fs/
+cp -f ./include/uapi/linux/aufs_type.h ../linux/include/uapi/linux/
+
+cd ..
+cd linux
+cp ../aufs4-standalone/aufs4*.patch ./
+patch -p1 < aufs4-kbuild.patch
+patch -p1 < aufs4-base.patch
+patch -p1 < aufs4-loopback.patch
+patch -p1 < aufs4-mmap.patch

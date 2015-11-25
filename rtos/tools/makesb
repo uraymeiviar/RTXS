@@ -1,0 +1,108 @@
+#!/bin/bash
+
+if [ "$#" -lt 3 ]; then
+	echo "usage   : $0 [source.list file] [rootfs dir] [strip dir]"
+	echo "example : $0 ./source.list ./pkg-rootfs ./strip-fs"
+else
+	SourceList=`readlink -f $1`
+	FsDir=`readlink -f $2`
+	StripDir=`readlink -f $3`
+
+	mkdir -p $FsDir
+
+	while read url; do
+        	urlfile="${url##*/}"
+        	echo $urlfile
+        	destdl="./$urlfile"
+        	if [ ! -f "$destdl" ]; then
+                	wget -q --no-check-certificate $url -O $destdl
+        	fi
+        	if [ -f "$destdl" ]; then
+			if [[ $destdl == *.txz ]] || [[ $destdl == *.tgz ]]; then
+                		installpkg --root $FsDir $destdl
+			elif [[ $destdl == *.deb ]]; then
+				deb2txz $destdl
+				installpkg --root $FsDir "$destdl.txz"
+				rm -f "$destdl.txz"
+			else
+				echo "--- error: dont know to extract $destdl"
+			fi
+        	else
+                	echo "--- error: file not found $destdl ---"
+        	fi
+	done <  $1
+
+	if [ -d "$FsDir/usr/lib/x86_64-linux-gnu" ]; then
+		mkdir -p "$FsDir/usr/lib64"
+		eval "cp -rf $FsDir/usr/lib/x86_64-linux-gnu/* $FsDir/usr/lib64/"
+		eval "rm -rf $FsDir/usr/lib/x86_64-linux-gnu"
+	fi
+
+	mkdir -p "$StripDir"
+        mkdir -p "$StripDir/usr/"
+        mkdir -p "$StripDir/usr/share"
+        mkdir -p "$StripDir/var"
+        mkdir -p "$StripDir/var/log"
+        mkdir -p "$StripDir/var/lib"
+
+	if [ -d "$FsDir/usr/doc" ]; then
+		cp -rf "$FsDir/usr/doc" "$StripDir/usr/"
+		rm -rf "$FsDir/usr/doc"
+	fi
+
+        if [ -d "$FsDir/usr/share/doc" ]; then
+                cp -rf "$FsDir/usr/share/doc" "$StripDir/usr/share"
+                rm -rf "$FsDir/usr/share/doc"
+        fi
+
+        if [ -d "$FsDir/usr/share/locale" ]; then
+                cp -rf "$FsDir/usr/share/locale" "$StripDir/usr/share"
+                rm -rf "$FsDir/usr/share/locale"
+        fi
+
+        if [ -d "$FsDir/usr/share/gtk-doc" ]; then
+                cp -rf "$FsDir/usr/share/gtk-doc" "$StripDir/usr/share"
+                rm -rf "$FsDir/usr/share/gtk-doc"
+        fi
+
+	if [ -d "$FsDir/usr/man" ]; then
+		cp -rf "$FsDir/usr/man" "$StripDir/usr/"
+		rm -rf "$FsDir/usr/man"
+	fi
+
+	if [ -d "$FsDir/var/log/packages" ]; then
+		cp -rf "$FsDir/var/log/packages" "$StripDir/var/log"
+		rm -rf "$FsDir/var/log/packages"
+	fi
+
+	if [ -d "$FsDir/var/log/removed_packages" ]; then
+		cp -rf "$FsDir/var/log/removed_packages" "$StripDir/var/log/"
+		rm -rf "$FsDir/var/log/removed_packages"
+	fi
+
+	if [ -d "$FsDir/var/log/removed_scripts" ]; then
+		cp -rf "$FsDir/var/log/removed_scripts" "$StripDir/var/log/"
+		rm -rf "$FsDir/var/log/removed_scripts"
+	fi
+
+	if [ -d "$FsDir/var/log/scripts" ]; then
+		cp -rf "$FsDir/var/log/scripts"  "$StripDir/var/log"
+		rm -rf "$FsDir/var/log/scripts"
+	fi
+
+	if [ -d "$FsDir/var/log/setup" ]; then
+		cp -rf "$FsDir/var/log/setup"  "$StripDir/var/log/"
+		rm -rf "$FsDir/var/log/setup"
+	fi
+
+	if [ -d "$FsDir/var/lib/dpkg" ]; then
+ 		cp -rf "$FsDir/var/lib/dpkg"  "$StripDir/var/lib"
+		rm -rf "$FsDir/var/lib/dpkg"
+	fi
+
+	echo "content size :"
+	du -sch $FsDir
+
+	echo "stripped size :"
+	du -sch $StripDir
+fi

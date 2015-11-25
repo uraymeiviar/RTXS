@@ -1,0 +1,21 @@
+#!/bin/bash
+
+SCRIPT=$0
+INITRAMFS=$1
+DIRECTORY=$2
+
+usage()
+{
+echo
+echo "extract cpio xz initramfs image file into an existing directory"
+echo "usage: $SCRIPT initramfs.cpio.xz directory"
+}
+
+not_a_directory() { echo; echo "$DIRECTORY is not a directory"; }
+exit_1() { echo; exit 1; }
+
+if [ $# -ne 2 ]; then usage; exit_1; fi
+if [ ! -d "$DIRECTORY" ]; then usage; not_a_directory; exit_1; fi
+
+(cd "$DIRECTORY"; xz --decompress --to-stdout --keep "$INITRAMFS" | cpio -i)
+
