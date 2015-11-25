@@ -1,0 +1,22 @@
+#!/bin/sh
+if [ "$#" -lt 2 ]; then
+        echo "usage   : $0 [path.list file] [target root dir]"
+        echo "example : $0 ./binpath.list ./pkg-rootfs"
+else
+        StripList=`readlink -f $1`
+        FsDir=`readlink -f $2`
+
+        if [ -d $FsDir ]; then
+                while read path; do
+			FullPath=$FsDir/$path
+			PurePath=`dirname "$FullPath"`
+			echo $PurePath
+			if [ -d "$PurePath" ]; then
+				eval "strip -s $FullPath"
+			fi
+                done < $StripList
+        else
+                echo "path $FsDir does not exist"
+        fi
+fi
+

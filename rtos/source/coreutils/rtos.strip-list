@@ -1,0 +1,7 @@
+usr/doc/*
+usr/share/doc/*
+usr/share/locale/*
+usr/man/*
+usr/share/man/*
+usr/share/i18n/locales/*
+usr/share/info/*

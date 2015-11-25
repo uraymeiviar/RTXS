@@ -1,0 +1,9 @@
+#!/bin/bash
+. rtos.config
+SourceFile=${Url##*/}
+rm -f ./$SourceFile
+rm -rf ./rootfs
+rm -rf ./basefs
+rm -rf ./stripfs
+rm -rf ./build
+rm -rf ./$Name

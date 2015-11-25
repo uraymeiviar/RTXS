@@ -1,0 +1,45 @@
+#!/bin/bash
+. rtos.config
+SourceFile=${Url##*/}
+if [ ! -d $Name ]; then
+	if [ ! -f $SourceFile ]; then
+		wget $Url -O ./$SourceFile --no-check-certificate
+	fi
+	tar -Jxvf ./$SourceFile
+fi
+
+cd $Name
+make clean
+cd ..
+
+if [ -d ./build ]; then
+	rm -rf ./build
+fi
+mkdir build
+if [ -d ./basefs ]; then
+        rm -rf ./basefs
+fi
+mkdir basefs
+if [ -d ./rootfs ]; then
+        rm -rf ./rootfs
+fi
+mkdir rootfs
+if [ -d ./stripfs ]; then
+        rm -rf ./stripfs
+fi
+mkdir stripfs
+
+cd build
+export FORCE_UNSAFE_CONFIGURE=1 
+../$Name/configure $ConfigArgs
+CFLAGS="\"$CFlagArgs\"" make all
+make install DESTDIR=../basefs
+
+cd ..
+cp -rf ./basefs/* ./rootfs
+./rtos.strip ./rtos.strip-list ./rootfs ./stripfs
+./rtos.stripbin ./rtos.binstrip-list ./rootfs
+find ./rootfs -type d -empty -delete
+du -sch ./rootfs
+cd rootfs
+tar -Jcvf ../$Name.package ./*
